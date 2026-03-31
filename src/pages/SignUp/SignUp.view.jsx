@@ -73,7 +73,8 @@ export const SignUpView = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleRegister = async () => {
+  const handleRegister = async (e) => {
+    e.preventDefault();
     if (!validateForm()) {
       return;
     }
@@ -91,7 +92,7 @@ export const SignUpView = () => {
         title: 'Cadastro realizado com sucesso',
         description: 'Bem-vindo ao Think Fast!',
       });
-      navigate('/dashboard');
+      navigate('/auth/login');
     } catch (err) {
       toaster.error({
         title: 'Erro ao realizar cadastro',
@@ -115,10 +116,7 @@ export const SignUpView = () => {
     <Center w='100%' h='100vh' my='10'>
       <Card.Root width='520px'>
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleRegister();
-          }}>
+          onSubmit={handleRegister}>
           <Card.Body gap='2'>
             <Center w='100%'>
               <img
@@ -228,7 +226,7 @@ export const SignUpView = () => {
             <Button type='submit' width={'100%'} disabled={isLoading}>
               Cadastrar
             </Button>
-            <Button variant='outline' onClick={handleCancel} width={'100%'}>
+            <Button type='button' variant='outline' onClick={handleCancel} width={'100%'}>
               Voltar
             </Button>
           </Card.Footer>

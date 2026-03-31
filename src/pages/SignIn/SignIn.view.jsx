@@ -29,7 +29,7 @@ export const SignInView = () => {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate('/auth/login');
+      navigate('/dashboard');
     }
   }, [navigate]);
 
