@@ -1,7 +1,7 @@
 import React,  { useEffect } from "react";
 import { Box, Button, Center, Flex, Heading, Icon, Image, Stack, Text} from "@chakra-ui/react";
 import { useNavigate } from "react-router";
-import { FaShoppingCart, FaChartBar, FaShieldAlt, FaSms } from "react-icons/fa";
+import { FaShoppingCart, FaChartBar, FaShieldAlt } from "react-icons/fa";
 import logo from '../../assets/logo_editada.png';
 import { isAuthenticated } from "../../apis/login";
 
@@ -61,7 +61,7 @@ export const HomeView = () => {
             borderRadius="md"
             p={6}
             textAlign="center"
-            w={["100%", "45%", "22%"]}
+            w={["100%", "45%", "30%"]}
             transition="all 1.3s ease"
           >
             <Icon as={FaShoppingCart} boxSize={8} color="blue.500" mb={3} />
@@ -77,7 +77,7 @@ export const HomeView = () => {
             borderRadius="md"
             p={6}
             textAlign="center"
-            w={["100%", "45%", "22%"]}
+            w={["100%", "45%", "30%"]}
             transition="all 1.3s ease"
           >
             <Icon as={FaChartBar} boxSize={8} color="green.500" mb={3} />
@@ -93,39 +93,13 @@ export const HomeView = () => {
             borderRadius="md"
             p={6}
             textAlign="center"
-            w={["100%", "45%", "22%"]}
+            w={["100%", "45%", "30%"]}
             transition="all 1.3s ease"
           >
             <Icon as={FaShieldAlt} boxSize={8} color="orange.400" mb={3} />
             <Heading as="h3" size="md" mb={2}>Segurança Total</Heading>
             <Text color="gray.600">
               Seus dados protegidos com autenticação segura e controle de acesso
-            </Text>
-          </Box>
-
-          <Box
-            bg="white"
-            boxShadow="xl"
-            borderRadius="md"
-            p={6}
-            textAlign="center"
-            w={["100%", "45%", "22%"]}
-            transition="all 1.3s ease"
-            // _hover={{
-            //   transform: "scale(1.08)",
-            //   background: "linear-gradient(to right,rgb(255, 255, 255),rgb(255, 255, 255))",
-            //   color: "black",
-            //   cursor:"pointer"
-              
-            // }}
-            // _active={{
-            //   transform: "scale(0.98)",
-            // }}
-          >
-            <Icon as={FaSms} boxSize={8} color="red.400" mb={3} />
-            <Heading as="h3" size="md" mb={2}>Ativação via SMS</Heading>
-            <Text color="gray.600">
-              Processo de verificação simples e seguro via WhatsApp
             </Text>
           </Box>
         </Flex>
