@@ -13,19 +13,21 @@ import {
   Image,
   Flex,
 } from '@chakra-ui/react';
-import { NativeSelect } from '@chakra-ui/react'; // ✅ importa o NativeSelect
+import { NativeSelect } from '@chakra-ui/react';
 import { toaster } from '../../components/ui/toaster';
 import logo from '../../assets/logo_editada.png';
 import { createProduct } from '../../apis/products';
 
+const defaultFormData = {
+  name: '',
+  price: '',
+  quantity: '',
+  image: '',
+  status: 'ativo',
+};
+
 export const CreateProductView = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    quantity: '',
-    image: '',
-    status: 'ativo',
-  });
+  const [formData, setFormData] = useState(defaultFormData);
 
   const [errors, setErrors] = useState({
     name: '',
@@ -66,7 +68,7 @@ export const CreateProductView = () => {
           description: 'O produto foi adicionado ao sistema',
         });
         // navigate('/products');
-        window.location.reload();
+        setFormData(defaultFormData);
       })
       .catch((err) => {
         toaster.error({
@@ -82,7 +84,7 @@ export const CreateProductView = () => {
   };
 
   const handleCancel = () => {
-    navigate('/products');
+    navigate('/dashboard');
   };
 
   return (
