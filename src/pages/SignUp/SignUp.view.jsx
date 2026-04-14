@@ -18,6 +18,27 @@ import { Link as ChakraLink } from '@chakra-ui/react';
 import { registerSeller } from '../../apis/registerSeller';
 import Loading from '../../components/Loading';
 
+const maskCNPJ = (value) => {
+  const digits = value.replace(/\D/g, '').slice(0, 14);
+  if (!digits) return '';
+  return digits
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2}\.\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/, '$1/$2')
+    .replace(/^(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/, '$1-$2');
+};
+
+const maskCellphone = (value) => {
+  let digits = value.replace(/\D/g, '');
+  if (digits.startsWith('55')) digits = digits.slice(2);
+  digits = digits.slice(0, 11);
+  if (!digits) return '';
+  let result = '+55 ';
+  if (digits.length <= 2) return result + `(${digits}`;
+  if (digits.length <= 7) return result + `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return result + `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+};
+
 export const SignUpView = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -52,9 +73,13 @@ export const SignUpView = () => {
     }
     if (!formData.cnpj) {
       errors.cnpj = 'CNPJ é obrigatório';
+    } else if (formData.cnpj.replace(/\D/g, '').length !== 14) {
+      errors.cnpj = 'CNPJ incompleto';
     }
     if (!formData.cellphone) {
       errors.cellphone = 'Celular é obrigatório';
+    } else if (formData.cellphone.replace(/\D/g, '').replace(/^55/, '').length !== 11) {
+      errors.cellphone = 'Celular incompleto';
     }
     if (!formData.email) {
       errors.email = 'Email é obrigatório';
@@ -82,8 +107,8 @@ export const SignUpView = () => {
     try {
       await registerSeller({
         name: formData.name,
-        cnpj: formData.cnpj,
-        cellphone: formData.cellphone,
+        cnpj: formData.cnpj.replace(/\D/g, ''),
+        cellphone: formData.cellphone.replace(/[\s()\-]/g, ''),
         email: formData.email,
         password: formData.password,
       });
@@ -113,7 +138,7 @@ export const SignUpView = () => {
   }
 
   return (
-    <Center w='100%' h='100vh' my='10'>
+    <Center w='100%' my='10'>
       <Card.Root width='520px'>
         <form
           onSubmit={handleRegister}>
@@ -135,33 +160,39 @@ export const SignUpView = () => {
                 <Field.Label>Nome</Field.Label>
                 <Input
                   placeholder='Insira seu nome'
+                  value={formData.name}
                   onChange={(e) => {
                     setErrors({ ...errors, name: '' });
                     setFormData({ ...formData, name: e.target.value });
                   }}
                 />
-                {errors.nickname && (
-                  <Field.ErrorText>{errors.nickname}</Field.ErrorText>
+                {errors.name && (
+                  <Field.ErrorText>{errors.name}</Field.ErrorText>
                 )}
               </Field.Root>
               <Field.Root invalid={!!errors.cnpj}>
-                {' '}
+
                 <Field.Label>CNPJ</Field.Label>
                 <Input
-                  placeholder='Insira seu CNPJ'
+                  placeholder='00.000.000/0000-00'
+                  value={formData.cnpj}
                   onChange={(e) => {
                     setErrors({ ...errors, cnpj: '' });
-                    setFormData({ ...formData, cnpj: e.target.value });
+                    setFormData({ ...formData, cnpj: maskCNPJ(e.target.value) });
                   }}
                 />
+                {errors.cnpj && (
+                  <Field.ErrorText>{errors.cnpj}</Field.ErrorText>
+                )}
               </Field.Root>
               <Field.Root invalid={!!errors.cellphone}>
                 <Field.Label>Celular</Field.Label>
                 <Input
-                  placeholder='Insira seu celular'
+                  placeholder='+55 (00) 00000-0000'
+                  value={formData.cellphone}
                   onChange={(e) => {
                     setErrors({ ...errors, cellphone: '' });
-                    setFormData({ ...formData, cellphone: e.target.value });
+                    setFormData({ ...formData, cellphone: maskCellphone(e.target.value) });
                   }}
                 />
                 {errors.cellphone && (
@@ -172,6 +203,7 @@ export const SignUpView = () => {
                 <Field.Label>Email</Field.Label>
                 <Input
                   placeholder='Insira seu email'
+                  value={formData.email}
                   onChange={(e) => {
                     setErrors({ ...errors, email: '' });
                     setFormData({ ...formData, email: e.target.value });
@@ -186,6 +218,7 @@ export const SignUpView = () => {
                 <Input
                   placeholder='Insira sua senha'
                   type='password'
+                  value={formData.password}
                   onChange={(e) => {
                     setErrors({ ...errors, password: '' });
                     setFormData({ ...formData, password: e.target.value });
@@ -200,6 +233,7 @@ export const SignUpView = () => {
                 <Input
                   placeholder='Confirme sua senha'
                   type='password'
+                  value={formData.passwordConfirm}
                   onChange={(e) => {
                     setErrors({ ...errors, passwordConfirm: '' });
                     setFormData({

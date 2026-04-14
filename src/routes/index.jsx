@@ -3,6 +3,9 @@ import { SignUpView } from '../pages/SignUp/SignUp.view';
 import { HomeView } from '../pages/Home/Home.view';
 import { createBrowserRouter } from 'react-router';
 import { Dashboard } from '../pages/Dashboard';
+import { Layout } from '../components/layout';
+import { PrivateRouteProvider } from './components/PrivateRouteProvider';
+import { CreateProductView } from '../pages/CreateProducts/CreateProducts.view';
 
 export const router = createBrowserRouter([
   {
@@ -19,6 +22,22 @@ export const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
-    element: <Dashboard />,
+    element: (
+      <PrivateRouteProvider>
+        <Layout activeKey='dashboard'>
+          <Dashboard />
+        </Layout>
+      </PrivateRouteProvider>
+    ),
+  },
+  {
+    path: '/products/new',
+    element: (
+      <PrivateRouteProvider>
+        <Layout activeKey='products'>
+          <CreateProductView />
+        </Layout>
+      </PrivateRouteProvider>
+    ),
   },
 ]);
