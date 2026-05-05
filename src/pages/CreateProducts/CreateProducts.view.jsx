@@ -67,8 +67,8 @@ export const CreateProductView = () => {
           title: 'Produto criado com sucesso',
           description: 'O produto foi adicionado ao sistema',
         });
-        // navigate('/products');
         setFormData(defaultFormData);
+        navigate('/products');
       })
       .catch((err) => {
         toaster.error({
@@ -84,7 +84,7 @@ export const CreateProductView = () => {
   };
 
   const handleCancel = () => {
-    navigate('/dashboard');
+    navigate('/products');
   };
 
   return (
