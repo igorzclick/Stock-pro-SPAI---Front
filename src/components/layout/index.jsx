@@ -26,7 +26,7 @@ import { TbTableDashed } from 'react-icons/tb';
 
 const navItems = [
   { label: 'Gerenciamento', icon: TbTableDashed, key: 'dashboard' },
-  { label: 'Produtos', icon: AiOutlineProduct, key: 'products/new' }, //TODO: Alterar a key para 'products' pra exibição da listagem posteriormente
+  { label: 'Produtos', icon: AiOutlineProduct, key: 'products' },
   // { label: 'Vendas', icon: AiOutlineShoppingCart, key: 'sales' },
 ];
 export const Layout = ({ activeKey = 'dashboard', children }) => {
