@@ -17,13 +17,13 @@ import {
   InputGroup,
   Dialog,
 } from '@chakra-ui/react';
-import { FiPlus, FiSearch, FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEdit, FiTrash2, FiEye, FiPackage } from 'react-icons/fi';
 import { FaCartPlus } from 'react-icons/fa';
-import { deleteProduct, getProducts } from '../../apis/products';
+import { deleteProduct, getProducts, restockProduct } from '../../apis/products';
 import { toaster } from '../../components/ui/toaster';
 import Loading from '../../components/Loading';
 import { useAtom } from 'jotai';
-// import { cartAtom } from '../../states/cart.states';
+import { cartAtom } from '../../states/cart.states';
 
 export const ListProductsview = () => {
   const navigate = useNavigate();
@@ -31,11 +31,17 @@ export const ListProductsview = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  // const [cartAtomState, setCartAtomState] = useAtom(cartAtom);
+  const [cartAtomState, setCartAtomState] = useAtom(cartAtom);
 
   // estado do modal
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // estado do reabastecimento
+  const [openRestock, setOpenRestock] = useState(false);
+  const [restockProductTarget, setRestockProductTarget] = useState(null);
+  const [restockQuantity, setRestockQuantity] = useState('');
+  const [loadingRestock, setLoadingRestock] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -54,25 +60,64 @@ export const ListProductsview = () => {
       });
   }, []);
 
-  // const handleAddProductToCart = (product) => {
-  //   const existingProduct = cartAtomState.find(
-  //     (item) => item.id === product.id
-  //   );
-  //   if (existingProduct) {
-  //     setCartAtomState((prev) =>
-  //       prev.map((item) =>
-  //         item.id === product.id
-  //           ? { ...item, quantity: item.quantity + 1 }
-  //           : item
-  //       )
-  //     );
-  //     return;
-  //   }
-  //   setCartAtomState((prev) => [
-  //     ...prev,
-  //     { id: product.id, quantity: 1, name: product.name },
-  //   ]);
-  // };
+  const handleAddProductToCart = (product) => {
+    const existingProduct = cartAtomState.find(
+      (item) => item.id === product.id
+    );
+    if (existingProduct) {
+      setCartAtomState((prev) =>
+        prev.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        )
+      );
+      return;
+    }
+    setCartAtomState((prev) => [
+      ...prev,
+      { id: product.id, quantity: 1, name: product.name },
+    ]);
+  };
+
+  const openRestockDialog = (product) => {
+    setRestockProductTarget(product);
+    setRestockQuantity('');
+    setOpenRestock(true);
+  };
+
+  const handleConfirmRestock = () => {
+    if (!restockProductTarget) return;
+    const qty = parseInt(restockQuantity, 10);
+    if (!qty || qty <= 0) {
+      toaster.error({
+        title: 'Quantidade inválida',
+        description: 'Digite um número inteiro positivo.',
+      });
+      return;
+    }
+    setLoadingRestock(true);
+    restockProduct(restockProductTarget.id, qty)
+      .then((data) => {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === data.product.id ? data.product : p))
+        );
+        toaster.success({
+          title: 'Estoque atualizado',
+          description: `${data.product.name}: +${qty} unidade(s) (total: ${data.product.quantity}).`,
+        });
+        setOpenRestock(false);
+        setRestockProductTarget(null);
+      })
+      .catch((err) => {
+        toaster.error({
+          title: 'Erro ao reabastecer',
+          description:
+            err?.response?.data?.message || 'Tente novamente mais tarde',
+        });
+      })
+      .finally(() => setLoadingRestock(false));
+  };
 
   const handleConfirmDelete = () => {
     if (selectedProduct) {
@@ -104,8 +149,8 @@ export const ListProductsview = () => {
 
   const filteredProducts = searchTerm
     ? products.filter((p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : products;
 
   const formatCurrency = (value) =>
@@ -247,17 +292,13 @@ export const ListProductsview = () => {
               <Table.Row key={p.id} _hover={{ bg: 'gray.50' }}>
                 <Table.Cell fontWeight='semibold'>{p.id}</Table.Cell>
                 <Table.Cell>
-                  {p.img ? (
-                    <Image
-                      src={p.img}
-                      alt={p.name}
-                      boxSize='50px'
-                      objectFit='cover'
-                      borderRadius='md'
-                    />
-                  ) : (
-                    <Text>Não há imagem</Text>
-                  )}
+                  <Image
+                    src={p.img || p.image}
+                    alt={p.name}
+                    boxSize='50px'
+                    objectFit='cover'
+                    borderRadius='md'
+                  />
                 </Table.Cell>
                 <Table.Cell>{p.name}</Table.Cell>
                 <Table.Cell>{formatCurrency(p.price)}</Table.Cell>
@@ -278,23 +319,31 @@ export const ListProductsview = () => {
                       onClick={() => navigate(`/product/detail/${p.id}`)}>
                       <FiEye />
                     </IconButton>
-                    {/* <IconButton
+                    <IconButton
                       size='sm'
                       variant='ghost'
                       aria-label='Editar'
                       color='blue.600'
                       onClick={() => navigate(`/products/edit/${p.id}`)}>
                       <FiEdit />
-                    </IconButton> */}
-                    {/* <IconButton
+                    </IconButton>
+                    <IconButton
                       size='sm'
                       variant='ghost'
                       aria-label='Adicionar ao carrinho'
                       color='blue.600'
                       onClick={() => handleAddProductToCart(p)}>
                       <FaCartPlus />
-                    </IconButton> */}
-                    {/* <IconButton
+                    </IconButton>
+                    <IconButton
+                      size='sm'
+                      variant='ghost'
+                      aria-label='Reabastecer estoque'
+                      color='green.600'
+                      onClick={() => openRestockDialog(p)}>
+                      <FiPackage />
+                    </IconButton>
+                    <IconButton
                       size='sm'
                       variant='ghost'
                       aria-label='Excluir'
@@ -304,7 +353,7 @@ export const ListProductsview = () => {
                         setOpenDelete(true);
                       }}>
                       <FiTrash2 />
-                    </IconButton> */}
+                    </IconButton>
                   </HStack>
                 </Table.Cell>
               </Table.Row>
@@ -322,6 +371,52 @@ export const ListProductsview = () => {
           </Table.Row>
         </Table.Footer>
       </Table.Root>
+
+      {/* Modal de reabastecimento */}
+      <Dialog.Root
+        open={openRestock}
+        onOpenChange={(e) => setOpenRestock(e.open)}>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content>
+            <Dialog.Header>
+              <Dialog.Title>Reabastecer estoque</Dialog.Title>
+            </Dialog.Header>
+
+            <Dialog.Body>
+              <Text mb={2}>
+                Produto: <strong>{restockProductTarget?.name}</strong>
+              </Text>
+              <Text mb={4} fontSize='sm' color='gray.600'>
+                Estoque atual: {restockProductTarget?.quantity ?? 0}
+              </Text>
+              <Input
+                type='number'
+                min='1'
+                placeholder='Quantidade a adicionar'
+                value={restockQuantity}
+                onChange={(e) => setRestockQuantity(e.target.value)}
+              />
+            </Dialog.Body>
+
+            <Dialog.Footer>
+              <Button
+                variant='outline'
+                onClick={() => setOpenRestock(false)}
+                disabled={loadingRestock}>
+                Cancelar
+              </Button>
+              <Button
+                bg={'green.600'}
+                color='white'
+                onClick={handleConfirmRestock}
+                disabled={loadingRestock}>
+                Confirmar
+              </Button>
+            </Dialog.Footer>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Dialog.Root>
 
       {/* Modal de confirmação de exclusão */}
       <Dialog.Root

@@ -22,18 +22,24 @@ import {
   AiOutlineProduct,
 } from 'react-icons/ai';
 import { useNavigate } from 'react-router';
+import { Cart } from '../Cart/Cart.view';
+import { useAtomValue } from 'jotai';
+import { cartAtom } from '../../states/cart.states';
 import { TbTableDashed } from 'react-icons/tb';
 
 const navItems = [
   { label: 'Gerenciamento', icon: TbTableDashed, key: 'dashboard' },
   { label: 'Produtos', icon: AiOutlineProduct, key: 'products' },
-  // { label: 'Vendas', icon: AiOutlineShoppingCart, key: 'sales' },
+  { label: 'Vendas', icon: AiOutlineShoppingCart, key: 'sales' },
 ];
 export const Layout = ({ activeKey = 'dashboard', children }) => {
   const bg = useColorModeValue('white', 'gray.900');
   const activeBg = useColorModeValue('blue.100', 'blue.700');
   const activeColor = useColorModeValue('blue.600', 'blue.300');
   const navigate = useNavigate();
+  const cartItems = useAtomValue(cartAtom);
+
+  const [open, setOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -88,6 +94,45 @@ export const Layout = ({ activeKey = 'dashboard', children }) => {
             );
           })}
         </VStack>
+
+        {/* Botão do Carrinho */}
+        <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+          <Drawer.Trigger asChild>
+            <Button
+              leftIcon={<AiOutlineShoppingCart />}
+              colorScheme='blue'
+              size='md'
+              mb={4}>
+              Ver Carrinho {cartItems.length}
+            </Button>
+          </Drawer.Trigger>
+
+          <Portal>
+            <Drawer.Backdrop />
+            <Drawer.Positioner>
+              <Drawer.Content>
+                <Drawer.Header>
+                  <Flex align='center' justify='space-between'>
+                    <Drawer.Title>Carrinho de Compras</Drawer.Title>
+                    <Drawer.CloseTrigger asChild>
+                      <CloseButton size='sm' />
+                    </Drawer.CloseTrigger>
+                  </Flex>
+                </Drawer.Header>
+
+                <Drawer.Body>
+                  <Cart />
+                </Drawer.Body>
+
+                <Drawer.Footer>
+                  <Button variant='outline' onClick={() => setOpen(false)}>
+                    Fechar
+                  </Button>
+                </Drawer.Footer>
+              </Drawer.Content>
+            </Drawer.Positioner>
+          </Portal>
+        </Drawer.Root>
 
         {/* Área do Usuário */}
         <Box>

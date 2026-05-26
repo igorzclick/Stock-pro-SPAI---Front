@@ -102,18 +102,14 @@ export const ProductDetailsView = () => {
           display='flex'
           alignItems='center'
           justifyContent='center'>
-          {product.img ? (
-            <Image
-              src={product.img}
-              alt={product.name}
-              borderRadius='md'
-              boxSize={{ base: '250px', md: '300px' }}
-              objectFit='contain'
-              shadow='md'
-            />
-          ) : (
-            <Text>Não há imagem</Text>
-          )}
+          <Image
+            src={product.image || product.img}
+            alt={product.name}
+            borderRadius='md'
+            boxSize={{ base: '250px', md: '300px' }}
+            objectFit='contain'
+            shadow='md'
+          />
         </Box>
 
         {/* Informações */}
@@ -167,7 +163,6 @@ export const ProductDetailsView = () => {
           <Stack direction='row' spacing={4}>
             <Button
               colorScheme='blue'
-              disabled
               onClick={() => navigate(`/products/edit/${product.id}`)}>
               Editar Produto
             </Button>
