@@ -18,14 +18,16 @@ import { toaster } from '../../components/ui/toaster';
 import logo from '../../assets/logo_editada.png';
 import { createProduct } from '../../apis/products';
 
+const defaultFormData = {
+  name: '',
+  price: '',
+  quantity: '',
+  image: '',
+  status: 'ativo',
+};
+
 export const CreateProductView = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    price: '',
-    quantity: '',
-    image: '',
-    status: 'ativo',
-  });
+  const [formData, setFormData] = useState(defaultFormData);
 
   const [errors, setErrors] = useState({
     name: '',
@@ -65,6 +67,7 @@ export const CreateProductView = () => {
           title: 'Produto criado com sucesso',
           description: 'O produto foi adicionado ao sistema',
         });
+        setFormData(defaultFormData);
         navigate('/products');
       })
       .catch((err) => {
