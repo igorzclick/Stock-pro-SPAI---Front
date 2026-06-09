@@ -26,11 +26,13 @@ import { Cart } from '../Cart/Cart.view';
 import { useAtomValue } from 'jotai';
 import { cartAtom } from '../../states/cart.states';
 import { TbTableDashed } from 'react-icons/tb';
+import { AiOutlineHistory } from 'react-icons/ai';
 
 const navItems = [
   { label: 'Gerenciamento', icon: TbTableDashed, key: 'dashboard' },
   { label: 'Produtos', icon: AiOutlineProduct, key: 'products' },
   { label: 'Vendas', icon: AiOutlineShoppingCart, key: 'sales' },
+  { label: 'Histórico', icon: AiOutlineHistory, key: 'stock-history' },
 ];
 export const Layout = ({ activeKey = 'dashboard', children }) => {
   const bg = useColorModeValue('white', 'gray.900');

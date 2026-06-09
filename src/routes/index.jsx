@@ -10,6 +10,7 @@ import { SalesView } from '../pages/Sales/Sales.view';
 import { EditProductView } from '../pages/EditProducts/EditProducts.view';
 import { CreateProductView } from '../pages/CreateProducts/CreateProducts.view';
 import { ProductDetailsView } from '../pages/ProductDetail/Product-detail.view';
+import { StockHistoryView } from '../pages/StockHistory/StockHistory.view';
 
 export const router = createBrowserRouter([
   {
@@ -80,6 +81,16 @@ export const router = createBrowserRouter([
       <PrivateRouteProvider>
         <Layout activeKey='dashboard'>
           <DashboardView />
+        </Layout>
+      </PrivateRouteProvider>
+    ),
+  },
+  {
+    path: '/stock-history',
+    element: (
+      <PrivateRouteProvider>
+        <Layout activeKey='stock-history'>
+          <StockHistoryView />
         </Layout>
       </PrivateRouteProvider>
     ),
