@@ -6,17 +6,15 @@ import {
   Heading,
   Button,
   Input,
+  Stack,
   HStack,
   IconButton,
   Table,
   InputGroup,
   Dialog,
-  Badge,
-  NativeSelect,
 } from "@chakra-ui/react";
 import { FiSearch, FiTrash2 } from "react-icons/fi";
-import { MdToggleOn, MdToggleOff } from "react-icons/md";
-import { deleteSale, getSales, toggleActiveSale } from "../../apis/sale";
+import { deleteSale, getSales } from "../../apis/sale";
 import { parseISO, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toaster } from "../../components/ui/toaster";
@@ -25,18 +23,15 @@ import Loading from "../../components/Loading";
 export const SalesView = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sales, setSales] = useState([]);
-  const [period, setPeriod] = useState("all");
 
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const [togglingId, setTogglingId] = useState(null);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    getSales(period)
+    getSales()
       .then((data) => setSales(data.sales))
       .catch(() =>
         toaster.error({
@@ -45,29 +40,7 @@ export const SalesView = () => {
         })
       )
       .finally(() => setLoading(false));
-  }, [period]);
-
-  const handleToggleActive = (sale) => {
-    setTogglingId(sale.id);
-    toggleActiveSale(sale.id)
-      .then((data) => {
-        setSales((prev) =>
-          prev.map((s) => (s.id === sale.id ? data.sale : s))
-        );
-        toaster.success({
-          title: data.sale.is_active ? "Venda reativada" : "Venda inativada",
-          description: `Venda ${sale.id} atualizada com sucesso.`,
-        });
-      })
-      .catch((err) =>
-        toaster.error({
-          title: "Erro ao alternar venda",
-          description:
-            err?.response?.data?.message || "Tente novamente mais tarde",
-        })
-      )
-      .finally(() => setTogglingId(null));
-  };
+  }, []);
 
   const filteredSales = searchTerm
     ? sales.filter(
@@ -171,30 +144,16 @@ export const SalesView = () => {
       </Flex>
 
       {/* Filtros e Busca */}
-      <Flex gap={4} mb={4} wrap="wrap" align="center">
-        <HStack spacing={2} maxW="400px" flex="1">
-          <InputGroup startElement={<FiSearch />}>
-            <Input
-              placeholder="Buscar por ID da venda ou ID do produto"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              flex="1"
-            />
-          </InputGroup>
-        </HStack>
-        <NativeSelect.Root maxW="200px">
-          <NativeSelect.Field
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-          >
-            <option value="all">Todas as vendas</option>
-            <option value="today">Hoje</option>
-            <option value="week">Última semana</option>
-            <option value="month">Este mês</option>
-          </NativeSelect.Field>
-          <NativeSelect.Indicator />
-        </NativeSelect.Root>
-      </Flex>
+      <HStack spacing={2} maxW="400px" flex="1">
+        <InputGroup startElement={<FiSearch />}>
+          <Input
+            placeholder="Buscar por ID da venda ou ID do produto"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            flex="1"
+          />
+        </InputGroup>
+      </HStack>
 
       {/* Tabela de Vendas */}
       <Box overflow="hidden">
@@ -215,12 +174,6 @@ export const SalesView = () => {
                 Quantidade
               </Table.ColumnHeader>
               <Table.ColumnHeader textAlign="left">Total</Table.ColumnHeader>
-              <Table.ColumnHeader textAlign="center">
-                Status
-              </Table.ColumnHeader>
-              <Table.ColumnHeader textAlign="center">
-                Inativar
-              </Table.ColumnHeader>
               <Table.ColumnHeader textAlign="center">
                 Deletar
               </Table.ColumnHeader>
@@ -249,26 +202,6 @@ export const SalesView = () => {
                     {formatCurrency(sale.price)}
                   </Table.Cell>
                   <Table.Cell textAlign="center">
-                    <Badge
-                      colorScheme={sale.is_active ? "green" : "gray"}
-                      variant="subtle"
-                    >
-                      {sale.is_active ? "Ativa" : "Inativa"}
-                    </Badge>
-                  </Table.Cell>
-                  <Table.Cell textAlign="center">
-                    <IconButton
-                      size="sm"
-                      variant="ghost"
-                      aria-label={sale.is_active ? "Inativar" : "Reativar"}
-                      color={sale.is_active ? "orange.600" : "green.600"}
-                      disabled={togglingId === sale.id}
-                      onClick={() => handleToggleActive(sale)}
-                    >
-                      {sale.is_active ? <MdToggleOn /> : <MdToggleOff />}
-                    </IconButton>
-                  </Table.Cell>
-                  <Table.Cell textAlign="center">
                     <IconButton
                       size="sm"
                       variant="ghost"
@@ -289,7 +222,7 @@ export const SalesView = () => {
 
           <Table.Footer>
             <Table.Row>
-              <Table.Cell colSpan={8}>
+              <Table.Cell colSpan={6}>
                 <Text fontSize="sm" color="gray.500" textAlign="right">
                   Total de vendas exibidas: {filteredSales.length}
                 </Text>

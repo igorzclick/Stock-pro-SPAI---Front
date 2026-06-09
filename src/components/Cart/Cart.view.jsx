@@ -1,5 +1,6 @@
 // src/components/Cart.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useAtom } from 'jotai';
 import {
   Box,
@@ -50,9 +51,10 @@ const CartItem = ({ product, onChangeQuantity }) => {
   );
 };
 
-export const Cart = () => {
+export const Cart = ({ onSaleComplete }) => {
   const [products, setProducts] = useAtom(cartAtom);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleQuantityChange = (id, newQuantity) => {
     if (newQuantity === 0) {
@@ -126,6 +128,8 @@ export const Cart = () => {
           description: 'Sua compra foi realizada com sucesso!',
         });
         setProducts([]);
+        onSaleComplete?.();
+        navigate('/dashboard');
       }
     } finally {
       setLoading(false);

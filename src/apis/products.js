@@ -38,8 +38,3 @@ export const deleteProduct = async (id) => {
   const response = await api.delete(`/product/${id}`);
   return response.data;
 };
-
-export const restockProduct = async (id, quantity) => {
-  const response = await api.patch(`/product/${id}/restock`, { quantity });
-  return response.data;
-};

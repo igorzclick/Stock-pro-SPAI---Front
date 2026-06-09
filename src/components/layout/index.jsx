@@ -1,7 +1,7 @@
 'use client';
 
 import logo from '../../assets/logo_editada.png';
-import React, { useState } from 'react';
+import React from 'react';
 import { useColorModeValue } from '../ui/color-mode';
 import {
   Box,
@@ -23,16 +23,14 @@ import {
 } from 'react-icons/ai';
 import { useNavigate } from 'react-router';
 import { Cart } from '../Cart/Cart.view';
-import { useAtomValue } from 'jotai';
-import { cartAtom } from '../../states/cart.states';
+import { useAtom, useAtomValue } from 'jotai';
+import { cartAtom, cartDrawerOpenAtom } from '../../states/cart.states';
 import { TbTableDashed } from 'react-icons/tb';
-import { AiOutlineHistory } from 'react-icons/ai';
 
 const navItems = [
   { label: 'Gerenciamento', icon: TbTableDashed, key: 'dashboard' },
   { label: 'Produtos', icon: AiOutlineProduct, key: 'products' },
   { label: 'Vendas', icon: AiOutlineShoppingCart, key: 'sales' },
-  { label: 'Histórico', icon: AiOutlineHistory, key: 'stock-history' },
 ];
 export const Layout = ({ activeKey = 'dashboard', children }) => {
   const bg = useColorModeValue('white', 'gray.900');
@@ -40,8 +38,7 @@ export const Layout = ({ activeKey = 'dashboard', children }) => {
   const activeColor = useColorModeValue('blue.600', 'blue.300');
   const navigate = useNavigate();
   const cartItems = useAtomValue(cartAtom);
-
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAtom(cartDrawerOpenAtom);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -123,7 +120,9 @@ export const Layout = ({ activeKey = 'dashboard', children }) => {
                 </Drawer.Header>
 
                 <Drawer.Body>
-                  <Cart />
+                  <Cart
+                    onSaleComplete={() => setOpen(false)}
+                  />
                 </Drawer.Body>
 
                 <Drawer.Footer>

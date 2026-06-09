@@ -5,6 +5,8 @@ import {
   Text,
   Heading,
   Badge,
+  Progress,
+  HStack,
 } from '@chakra-ui/react';
 import {
   getDashboardMetrics,
@@ -159,7 +161,7 @@ export const DashboardView = () => {
           )}
 
           {lowStockProducts.map((product) => (
-            <Box mb={4} key={product.id}>
+            <Box mb={4}>
               <Flex justify='space-between' mb={1}>
                 <Text>{product.name}</Text>
                 {product.quantity === 0 ? (
@@ -180,7 +182,14 @@ export const DashboardView = () => {
         </Box>
 
         {/* Top Produtos */}
-        <Box flex='1' minW='300px' borderWidth='1px' borderRadius='md' p={4}>
+        <Box
+          flex='1'
+          minW='300px'
+          borderWidth='1px'
+          borderRadius='md'
+          p={4}
+          // bg={grayLight}
+        >
           <Flex align='center' mb={4} justify='space-between'>
             <Text fontWeight='bold'>Top Produtos</Text>
             <Text fontSize='sm' color='gray.600'>
@@ -195,7 +204,7 @@ export const DashboardView = () => {
           )}
 
           {topSellingProducts.map((product, index) => (
-            <Box mb={4} key={product.id}>
+            <Box mb={4}>
               <Flex justify='space-between' mb={1}>
                 <Text fontWeight='semibold'>{product.name}</Text>
                 <Badge colorScheme='gray' variant='outline' fontSize='xs'>
@@ -236,6 +245,8 @@ export const DashboardView = () => {
                 {formatCurrency(salesSummary.revenue_today)}
               </Text>
             </Flex>
+
+            {/* <Box height="1px" bg="gray.200" my={3} /> */}
           </Box>
 
           {/* Ontem */}
@@ -252,6 +263,8 @@ export const DashboardView = () => {
                 {formatCurrency(salesSummary.revenue_yesterday)}
               </Text>
             </Flex>
+
+            {/* <Box height="1px" bg="gray.200" my={3} /> */}
           </Box>
 
           {/* Esta Semana */}
