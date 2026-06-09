@@ -11,7 +11,7 @@ import {
   Link as ChakraLink,
   Field,
 } from '@chakra-ui/react';
-import { loginSeller, isAuthenticated } from '../../apis/login';
+import { loginSeller, isAuthenticated, setToken } from '../../apis/login';
 import { Link, useNavigate } from 'react-router';
 import { toaster } from '../../components/ui/toaster';
 import logo from '../../assets/logo_editada.png';
@@ -51,7 +51,7 @@ export const SignInView = () => {
     setIsLoading(true);
     try {
       const data = await loginSeller({ ...formData });
-      localStorage.setItem('token', data.access_token);
+      setToken(data.access_token);
       toaster.success({
         title: 'Login realizado com sucesso',
         description: 'Bem-vindo de volta!',

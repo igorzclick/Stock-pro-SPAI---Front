@@ -22,6 +22,7 @@ import {
   AiOutlineProduct,
 } from 'react-icons/ai';
 import { useNavigate } from 'react-router';
+import { logout } from '../../apis/login';
 import { Cart } from '../Cart/Cart.view';
 import { useAtom, useAtomValue } from 'jotai';
 import { cartAtom, cartDrawerOpenAtom } from '../../states/cart.states';
@@ -41,7 +42,7 @@ export const Layout = ({ activeKey = 'dashboard', children }) => {
   const [open, setOpen] = useAtom(cartDrawerOpenAtom);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    logout();
     navigate('/');
   };
 

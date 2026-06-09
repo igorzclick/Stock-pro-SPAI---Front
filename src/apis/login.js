@@ -1,4 +1,5 @@
 import { api } from './config';
+import { clearToken, getToken, isAuthenticated, setToken } from '../utils/authToken';
 
 export async function loginSeller({ email, password }) {
   const response = await api.post('/auth/login', {
@@ -8,14 +9,8 @@ export async function loginSeller({ email, password }) {
   return response.data;
 }
 
-export function isAuthenticated() {
-  return localStorage.getItem('token') !== null;
-}
-
-export function getToken() {
-  return localStorage.getItem('token');
-}
+export { setToken, getToken, isAuthenticated };
 
 export function logout() {
-  localStorage.removeItem('token');
+  clearToken();
 }
